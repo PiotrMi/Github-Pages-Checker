@@ -17,12 +17,8 @@ if isinstance(repos, dict) and repos.get('message') == 'Not Found':
 # Filter repositories that have GitHub Pages enabled
 pages_repos = []
 for repo in repos:
-    url = f'https://api.github.com/repos/{username}/{repo["name"]}/pages'
-    response = requests.get(url)
-    pages = response.json()
-    if pages.get('message') == 'Not Found':
-        continue
-    pages_repos.append(repo['name'])
+    if repo.get('has_pages'):
+        pages_repos.append(repo['name'])
 
 # Print the list of repositories with GitHub Pages enabled
 print(f'Repositories with GitHub Pages enabled: {", ".join(pages_repos)}')
