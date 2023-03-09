@@ -1,119 +1,136 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>GitHub Pages Repositories</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        color: #444;
-        background-color: #f6f6f6;
-        margin: 0;
-        padding: 0;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            color: #444;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+        }
 
-      h1 {
-        font-size: 24px;
-        font-weight: bold;
-        margin: 20px 0;
-        text-align: center;
-      }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
 
-      form {
-        display: flex;
-        flex-direction: column;
-        margin: 20px;
-      }
+        form {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
 
-      label {
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
 
-      input {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
 
-      button {
-        padding: 10px;
-        background-color: #444;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-      }
+        button {
+            padding: 10px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-      button:hover {
-        background-color: #666;
-      }
+        button:hover {
+            background-color: #666;
+        }
 
-      ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
 
-      li {
-        padding: 10px;
-        border-bottom: 1px solid #ccc;
-        font-size: 16px;
-      }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+        }
 
-      li:last-child {
-        border-bottom: none;
-      }
+        li:last-child {
+            border-bottom: none;
+        }
+
+        a {
+            color: #444;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>GitHub Pages Repositories</h1>
     <form id="username-form">
-      <label for="username-input">Enter your GitHub username:</label>
-      <input type="text" id="username-input" name="username">
-      <button type="submit">Fetch Repositories</button>
+        <label for="username-input">Enter your GitHub username:</label>
+        <input type="text" id="username-input" name="username">
+        <button type="submit">Fetch Repositories</button>
     </form>
     <ul id="repo-list"></ul>
     <script>
-      const form = document.getElementById('username-form');
-      const repoList = document.getElementById('repo-list');
+        const form = document.getElementById('username-form');
+        const repoList = document.getElementById('repo-list');
 
-      form.addEventListener('submit', event => {
-        event.preventDefault();
-        const username = document.getElementById('username-input').value;
-        const url = `https://api.github.com/users/${username}/repos`;
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const username = document.getElementById('username-input').value;
+            const url = `https://api.github.com/users/${username}/repos`;
 
-        repoList.innerHTML = ''; // Clear the previous list
+            repoList.innerHTML = ''; // Clear the previous list
 
-        fetch(url)
-          .then(response => response.json())
-          .then(repos => {
-            const pagesRepos = repos.filter(repo => repo.has_pages).map(repo => repo.name);
-            if (pagesRepos.length === 0) {
-              const listItem = document.createElement('li');
-              const text = document.createTextNode('No repositories found with GitHub Pages enabled.');
-              listItem.appendChild(text);
-              repoList.appendChild(listItem);
-            } else {
-              pagesRepos.forEach(repoName => {
-                const listItem = document.createElement('li');
-                const text = document.createTextNode(repoName);
-                listItem.appendChild(text);
-                repoList.appendChild(listItem);
-              });
-            }
-          })
-          .catch(error => {
-            const listItem = document.createElement('li');
-            const text = document.createTextNode(`Error: ${error.message}`);
-            listItem.appendChild(text);
-            repoList.appendChild(listItem);
-          });
-      });
+            fetch(url)
+                .then(response => response.json())
+                .then(repos => {
+                    const pagesRepos = repos.filter(repo => repo.has_pages).map(repo => ({
+                        name: repo.name,
+                        url: repo.html_url + '/pages'
+                    }));
+                    if (pagesRepos.length === 0) {
+                        const listItem = document.createElement('li');
+                        const text = document.createTextNode('No repositories found with GitHub Pages enabled.');
+                        listItem.appendChild(text);
+                        repoList.appendChild(listItem);
+                    } else {
+                        pagesRepos.forEach(repo => {
+                            const listItem = document.createElement('li');
+                            const link = document.createElement('a');
+                            link.href = repo.url;
+                            link.textContent = repo.name;
+                            listItem.appendChild(link);
+                            repoList.appendChild(listItem);
+                        });
+                    }
+                })
+                .catch(error => {
+                    const listItem = document.createElement('li');
+                    const text = document.createTextNode(`Error: ${error.message}`);
+                    listItem.appendChild(text);
+                    repoList.appendChild(listItem);
+                });
+        });
     </script>
-  </body>
+</body>
+
 </html>
