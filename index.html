@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>GitHub Pages Repositories</title>
+  </head>
+  <body>
+    <h1>GitHub Pages Repositories</h1>
+    <form id="username-form">
+      <label for="username-input">Enter your GitHub username:</label>
+      <input type="text" id="username-input" name="username">
+      <button type="submit">Fetch Repositories</button>
+    </form>
+    <ul id="repo-list"></ul>
+    <script>
+      const form = document.getElementById('username-form');
+      const repoList = document.getElementById('repo-list');
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const username = document.getElementById('username-input').value;
+        const url = `https://api.github.com/users/${username}/repos`;
+
+        repoList.innerHTML = ''; // Clear the previous list
+
+        fetch(url)
+          .then(response => response.json())
+          .then(repos => {
+            const pagesRepos = repos.filter(repo => repo.has_pages).map(repo => repo.name);
+            if (pagesRepos.length === 0) {
+              const listItem = document.createElement('li');
+              const text = document.createTextNode('No repositories found with GitHub Pages enabled.');
+              listItem.appendChild(text);
+              repoList.appendChild(listItem);
+            } else {
+              pagesRepos.forEach(repoName => {
+                const listItem = document.createElement('li');
+                const text = document.createTextNode(repoName);
+                listItem.appendChild(text);
+                repoList.appendChild(listItem);
+              });
+            }
+          })
+          .catch(error => {
+            const listItem = document.createElement('li');
+            const text = document.createTextNode(`Error: ${error.message}`);
+            listItem.appendChild(text);
+            repoList.appendChild(listItem);
+          });
+      });
+    </script>
+  </body>
+</html>
